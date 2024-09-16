@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 
 function ChatRoom() {
   const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("")
 
   // Fetch messages from the messages table when the component mounts
   useEffect(() => {
@@ -26,6 +27,31 @@ function ChatRoom() {
     fetchMessages();
   }, []);
 
+  // Function to send a new message
+  async function handleSendMessage(e){
+    e.preventdefault()
+
+    if(newMessage.trim() === "") return; // Don't send any empty messages
+
+    const user = supabase.auth.user() // get the currently logged-in user from supabase
+
+    if(!user){
+        alert("You must be logged in to send messages.")
+        return;
+    }
+
+    const { error } = await supabase
+        .from("messages")
+        .insert([{message_text: newMessage, user_id: user.id}])
+
+    if(error){
+        console.error("Error sending message:", error)
+    } else {
+        setNewMessage("")
+    }
+
+  }
+
   return (
     <div>
       <h2>Chat Room</h2>
@@ -37,6 +63,15 @@ function ChatRoom() {
           </div>
         ))}
       </div>
+      <form onSubmit={handleSendMessage}>
+        <input 
+            type="text"
+            placeholder="Type a message... "
+            value={newMessage}
+            onChange={(e) => {setNewMessage(e.target.value)}}
+        />
+        <button type="submit">Send</button>
+      </form>
     </div>
   );
 }
