@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import SignUp from './components/SignUp';
 import Login from './components/Login';
+import ChatRoom from './ChatRoom';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -54,6 +55,7 @@ function App() {
   return (
     <div>
       <p>Welcome, {session.user.email}</p>
+      <ChatRoom />
       <button onClick={() => supabase.auth.signOut()}>Sign Out</button>
     </div>
   );
